@@ -218,6 +218,14 @@ const Schema& default_schema() {
                   {}, {}, "Colour shown where the wallpaper cannot be loaded", 1, {}});
         out->add({"desktop.wallpaper-mode", Type::String, std::string("fill"),
                   {}, {}, "How the wallpaper is fitted: stretch, fit, fill, center, tile", 1, {}});
+
+        // Empty means "whatever the desktop is set to", which is the right
+        // default for a dock installed on KDE or sway where LucidOS's icons may
+        // not exist. LucidOS's own distro layer sets it to Lucid, so the session
+        // is themed without the standalone dock imposing a theme nobody asked
+        // for -- which is exactly the layering this resolver is for.
+        out->add({"desktop.icon-theme", Type::String, std::string(""),
+                  {}, {}, "Icon theme; empty follows the desktop's own setting", 1, {}});
         return out;
     }();
     return *s;
