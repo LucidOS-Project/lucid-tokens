@@ -79,3 +79,25 @@ Consumed by [lucid-dock](https://github.com/LucidOS-Project/lucid-dock), and
 paired with `lucid-session`, which covers the half of the safety claim a resolver
 cannot: a configuration can be entirely valid and still produce a desktop you
 cannot use.
+
+## Licence
+
+LGPL-2.1-or-later.
+
+The resolver is only worth building if things other than the LucidOS dock use
+it: a configuration model with per-key provenance is a feature of one desktop
+if one desktop has it, and how the desktop does settings if several do. So the
+licence has to be one a project can adopt without relicensing itself --
+including the permissively-licensed half of the Wayland world, sway and wlroots
+under MIT and Hyprland under BSD-3, which would simply decline rather than
+become GPL to consume one library.
+
+LGPL-2.1 rather than MIT because improvements to the resolver itself should come
+back: anything may link it, under any licence, but a change to *this code* stays
+under this licence. And 2.1 rather than 3, which is the detail that matters --
+LGPL-3 is incompatible with GPL-2-only code, so it would lock out exactly the
+kind of consumer this is meant to reach.
+
+`lucid-dock` and `lucid-session` are GPL-3: they are end-user programs, nothing
+links them, so copyleft costs no adoption there and closes off proprietary
+forks.
