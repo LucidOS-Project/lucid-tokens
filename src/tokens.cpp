@@ -188,6 +188,17 @@ const Schema& default_schema() {
         num("panel.padding-x",          12.0,   0.0,  64.0, "Panel horizontal padding");
         num("panel.background-opacity",  0.4,   0.0,   1.0, "Panel background alpha");
         out->add({"panel.enabled", Type::Bool, true, {}, {}, "Show the panel", 1, {}});
+        num("panel.corner-radius",      14.0,   0.0,  32.0, "Panel corner radius");
+        num("panel.margin",              8.0,   0.0,  64.0,
+            "Gap between the panel and the screen edges; 0 makes it flush");
+
+        // Desktop-wide rather than per-surface. A font is not the dock's or the
+        // panel's opinion, it is the desktop's, and a key every surface reads is
+        // the strongest form of the claim this schema makes: one value, one
+        // place to change it, every component follows.
+        out->add({"desktop.font-family", Type::String, std::string("Manrope"),
+                  {}, {}, "Interface font family", 1, {}});
+        num("desktop.font-size",        12.0,   6.0,  32.0, "Interface font size, pt");
         return out;
     }();
     return *s;
