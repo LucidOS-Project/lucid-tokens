@@ -199,6 +199,25 @@ const Schema& default_schema() {
         out->add({"desktop.font-family", Type::String, std::string("Inter"),
                   {}, {}, "Interface font family", 1, {}});
         num("desktop.font-size",        12.0,   6.0,  32.0, "Interface font size, pt");
+
+        // The wallpaper is a path, so it is the one key here with no meaningful
+        // range and no way to validate beyond "is it a string". It is a token
+        // anyway because everything else about the desktop's appearance is:
+        // splitting it out into its own file would mean two places to look for
+        // "what does my desktop look like", and the provenance query -- which
+        // layer set this, a theme or me -- is exactly as useful here as it is
+        // for a corner radius.
+        //
+        // An unreadable path is not an error. The session falls back to
+        // desktop.wallpaper-colour, which is why that exists and why a colour
+        // rather than a second path: a colour cannot itself be missing.
+        out->add({"desktop.wallpaper", Type::String,
+                  std::string("/usr/share/backgrounds/lucid/lucid.png"),
+                  {}, {}, "Wallpaper image path", 1, {}});
+        out->add({"desktop.wallpaper-colour", Type::String, std::string("#2f6fb0"),
+                  {}, {}, "Colour shown where the wallpaper cannot be loaded", 1, {}});
+        out->add({"desktop.wallpaper-mode", Type::String, std::string("fill"),
+                  {}, {}, "How the wallpaper is fitted: stretch, fit, fill, center, tile", 1, {}});
         return out;
     }();
     return *s;
