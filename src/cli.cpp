@@ -62,8 +62,17 @@ int main(int argc, char** argv) {
         Config cfg = load();
         for (const auto& def : default_schema().keys()) {
             const Resolved r = cfg.resolve(def.key);
-            std::printf("%-28s %-10s  [%s]\n", def.key.c_str(),
-                        to_string(r.value).c_str(), layer_name(r.layer));
+            // A deprecated key still resolves -- a config carrying it must not
+            // break -- but listing it like a live setting invites someone to
+            // set it and wonder why nothing moved. Say what replaced it.
+            if (!def.replaced_by.empty()) {
+                std::printf("%-28s %-10s  [%s]  replaced by %s\n", def.key.c_str(),
+                            to_string(r.value).c_str(), layer_name(r.layer),
+                            def.replaced_by.c_str());
+            } else {
+                std::printf("%-28s %-10s  [%s]\n", def.key.c_str(),
+                            to_string(r.value).c_str(), layer_name(r.layer));
+            }
         }
         return 0;
     }
