@@ -69,5 +69,13 @@ validate, and revert.
 
 ## Status
 
-Working and tested. Not yet wired into the dock, and no file-watching for live
-reload — both are next.
+Working, tested, and in use. `lucid-dock` reads its geometry, motion and
+stylesheet values from here; its settings page shows each key's layer and offers
+a per-key reset, both of which are one lookup against the resolver rather than a
+feature each. The token files are watched, so a `lucid-tokens set` applies to the
+running dock without a restart.
+
+Consumed by [lucid-dock](https://github.com/LucidOS-Project/lucid-dock), and
+paired with `lucid-session`, which covers the half of the safety claim a resolver
+cannot: a configuration can be entirely valid and still produce a desktop you
+cannot use.

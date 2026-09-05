@@ -170,6 +170,14 @@ const Schema& default_schema() {
         out->add({"dock.release-tau", Type::Double, 0.135, 0.0, 2.0,
                   "Removed: the dock eases with a spring", 1, "dock.spring-omega"});
         num("dock.indicator-size",      4.0,   0.0,  24.0, "Running-app dot size, logical px");
+        // Icons arrive from whichever theme happens to answer, and they are not
+        // drawn to a common grid: an application shipping its own icon under
+        // hicolor may fill its canvas edge to edge while a theme's own icons
+        // leave a margin, so the two read as different sizes side by side. This
+        // is the fraction of the icon box the artwork is scaled to occupy.
+        // 0 disables it and leaves every icon exactly as its theme drew it.
+        num("dock.icon-ink-ratio",      0.9,   0.0,   1.0,
+            "Fraction of the icon box the artwork fills; 0 leaves icons untouched");
         out->add({"dock.enabled", Type::Bool, true, {}, {}, "Show the dock", 1, {}});
         return out;
     }();
