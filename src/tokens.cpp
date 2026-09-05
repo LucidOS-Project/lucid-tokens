@@ -241,7 +241,19 @@ std::string default_user_dir() {
     return std::string(home ? home : ".") + "/.config/lucid/profile.d";
 }
 
-std::string default_distro_dir() { return "/usr/share/lucid/profile.d"; }
+std::string default_distro_dir() {
+    // LUCID_DISTRO_DIR, for the same reason XDG_CONFIG_HOME already moves the
+    // user layer: a layered resolver whose layers cannot be pointed anywhere is
+    // a layered resolver that can only be tested as root. The distro layer is
+    // the one that decides what a LucidOS session looks like as opposed to a
+    // bare dock, and it was the only layer with no way to exercise it.
+    if (const char* dir = std::getenv("LUCID_DISTRO_DIR")) {
+        if (*dir != '\0') {
+            return dir;
+        }
+    }
+    return "/usr/share/lucid/profile.d";
+}
 
 // Every layer's value for a key is kept, not just the winning one. Keeping
 // only the winner made reset fall through to the compiled default instead of
