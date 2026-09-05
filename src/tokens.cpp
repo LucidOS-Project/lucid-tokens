@@ -179,6 +179,15 @@ const Schema& default_schema() {
         num("dock.icon-ink-ratio",      0.9,   0.0,   1.0,
             "Fraction of the icon box the artwork fills; 0 leaves icons untouched");
         out->add({"dock.enabled", Type::Bool, true, {}, {}, "Show the dock", 1, {}});
+
+        // The panel: the second surface, and the reason the schema is a schema
+        // rather than a header in the dock. These keys are read by a different
+        // process, on a different edge of the screen, from the same files --
+        // which is the whole claim the layered resolver makes.
+        num("panel.height",             28.0,  20.0,  64.0, "Panel height, logical px");
+        num("panel.padding-x",          12.0,   0.0,  64.0, "Panel horizontal padding");
+        num("panel.background-opacity",  0.4,   0.0,   1.0, "Panel background alpha");
+        out->add({"panel.enabled", Type::Bool, true, {}, {}, "Show the panel", 1, {}});
         return out;
     }();
     return *s;
