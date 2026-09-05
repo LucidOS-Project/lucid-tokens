@@ -196,7 +196,7 @@ const Schema& default_schema() {
         // panel's opinion, it is the desktop's, and a key every surface reads is
         // the strongest form of the claim this schema makes: one value, one
         // place to change it, every component follows.
-        out->add({"desktop.font-family", Type::String, std::string("Manrope"),
+        out->add({"desktop.font-family", Type::String, std::string("Inter"),
                   {}, {}, "Interface font family", 1, {}});
         num("desktop.font-size",        12.0,   6.0,  32.0, "Interface font size, pt");
         return out;
