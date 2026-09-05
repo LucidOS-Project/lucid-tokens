@@ -8,6 +8,8 @@
 #include <filesystem>
 #include <fstream>
 #include <random>
+#include <string>
+#include <vector>
 
 using namespace lucid;
 
@@ -27,6 +29,64 @@ int main() {
     std::filesystem::remove_all(root);
     const auto user = root / "user";
     const auto distro = root / "distro";
+
+    std::puts("namespace-scoped diagnostics");
+    {
+        const auto ns = root / "ns";
+        // One file, three components' worth of keys, plus a key nothing owns.
+        write(ns / "90-user.ini",
+              "[dock]\nicon-size = 64\n"
+              "[panel]\nheight = 44\n"
+              "[nosuch]\nkey = 3\n");
+
+        auto unknown_keys = [](const Config& c) {
+            std::vector<std::string> out;
+            for (const Diagnostic& d : c.diagnostics()) {
+                if (d.problem == "unknown key") out.push_back(d.key);
+            }
+            return out;
+        };
+
+        // A doctor owns nothing, so it owns the question: it must still see
+        // everything, or a typo in an unclaimed namespace would be invisible to
+        // every program on the system.
+        Config doctor(default_schema());
+        doctor.load(ns.string());
+        check(unknown_keys(doctor).size() == 1 && unknown_keys(doctor)[0] == "nosuch.key",
+              "owning nothing still reports every unknown key");
+
+        // A component owning "dock" must not complain about panel.height. This
+        // is the case that produced the change: with two components pinned to
+        // different schema versions, each called the other's settings typos.
+        Config dock(default_schema());
+        dock.own_namespace("dock");
+        dock.load(ns.string());
+        check(unknown_keys(dock).empty(), "owning dock reports nothing about panel or nosuch");
+        check(dock.get_double("dock.icon-size") == 64.0, "and still reads its own keys");
+        check(dock.get_double("panel.height") == 44.0,
+              "and other namespaces still resolve -- scoping is about reporting");
+
+        // Its own namespace is still policed, or scoping would have traded one
+        // silence for a worse one.
+        write(ns / "91-typo.ini", "[dock]\nicon-sze = 64\n");
+        Config dock2(default_schema());
+        dock2.own_namespace("dock");
+        dock2.load(ns.string());
+        check(unknown_keys(dock2).size() == 1 && unknown_keys(dock2)[0] == "dock.icon-sze",
+              "a typo inside the owned namespace is still reported");
+
+        // Prefix matching is on a whole segment: owning "dock" is not owning
+        // "dockyard".
+        write(ns / "92-yard.ini", "[dockyard]\nthing = 1\n");
+        Config dock3(default_schema());
+        dock3.own_namespace("dock");
+        dock3.load(ns.string());
+        bool saw_yard = false;
+        for (const std::string& k : unknown_keys(dock3)) {
+            if (k == "dockyard.thing") saw_yard = true;
+        }
+        check(!saw_yard, "owning dock does not silently also own dockyard");
+    }
 
     std::puts("layering");
     {

@@ -232,6 +232,29 @@ void Config::put(const std::string& key, Value v, Layer layer, const std::string
     entries_.push_back({key, Entry{std::move(v), layer, file}});
 }
 
+void Config::own_namespace(const std::string& prefix) {
+    if (!prefix.empty()) {
+        owned_.push_back(prefix);
+    }
+}
+
+// Owning nothing means owning the question: report every unknown key, which is
+// what a doctor wants. Owning something means reporting only what is yours.
+bool Config::reports_unknown(const std::string& key) const {
+    if (owned_.empty()) {
+        return true;
+    }
+    for (const std::string& prefix : owned_) {
+        // Prefix plus a dot, so owning "dock" does not silently also own
+        // "dockyard.something".
+        if (key.size() > prefix.size() + 1 && key.compare(0, prefix.size(), prefix) == 0 &&
+            key[prefix.size()] == '.') {
+            return true;
+        }
+    }
+    return false;
+}
+
 void Config::load_file(const std::string& path, Layer layer) {
     std::ifstream in(path);
     if (!in) return;
@@ -263,7 +286,12 @@ void Config::load_file(const std::string& path, Layer layer) {
         if (def == nullptr) {
             // Forward compatibility: a config written by a NEWER LucidOS must
             // not break an older one. Unknown keys are carried, not fatal.
-            diags_.push_back({key, path, "unknown key", "ignored, file left unchanged"});
+            //
+            // Whether this consumer says so is a separate question from whether
+            // it survives it -- see own_namespace().
+            if (reports_unknown(key)) {
+                diags_.push_back({key, path, "unknown key", "ignored, file left unchanged"});
+            }
             continue;
         }
 

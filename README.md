@@ -50,6 +50,39 @@ make && make check
 Hand-edit `~/.config/lucid/profile.d/90-user.ini` into nonsense and run
 `./lucid-tokens doctor`. Every setting still resolves to something usable.
 
+## Who reports an unknown key
+
+An unknown key is always carried -- a config written by a newer LucidOS must
+never break an older one, and that invariant does not move. Who *reports* it is
+a separate question, and having a second consumer is what raised it.
+
+A desktop is several programs sharing one set of files, each compiled against
+the schema version it was built with. The moment `lucid-panel` existed,
+`lucid-dock` -- pinned to an older schema -- began warning `unknown key` about
+`panel.height` on every load, and would have done the same for every component
+added after it. Nothing broke, which is the invariant working. But a program
+complaining about configuration that is not its own is noise, and noise in a
+diagnostic channel is how real diagnostics stop being read.
+
+```cpp
+Config cfg(default_schema());
+cfg.own_namespace("dock");     // before load()
+cfg.load(default_user_dir(), default_distro_dir());
+```
+
+So `lucid-dock` owns `dock`, `lucid-panel` owns `panel`, and both own `desktop`.
+Neither reports the other's keys, both still *resolve* them -- scoping is about
+reporting, not about reading.
+
+**Declaring nothing keeps reporting everything**, and that is not a leftover
+default: `lucid-tokens doctor` and a settings application want exactly that.
+Something has to see the whole file, because a typo in a namespace no component
+claims -- `dokc.icon-size` -- is invisible to every component by construction
+and is precisely what a doctor is for.
+
+Prefix matching is on a whole segment, so owning `dock` is not owning
+`dockyard`.
+
 ## Testing
 
 The resolver is a pure function from a layer stack to a value plus provenance,

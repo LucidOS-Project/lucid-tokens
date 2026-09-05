@@ -89,6 +89,25 @@ class Config {
   public:
     explicit Config(const Schema& schema);
 
+    // Declare a namespace this consumer is responsible for, e.g. "dock".
+    // Repeatable. Call before load().
+    //
+    // An unknown key is always carried -- a config written by a newer LucidOS
+    // must never break an older one, and that invariant does not change. What
+    // this changes is who *reports* it. A desktop is several programs sharing
+    // one set of files, each compiled against the schema version it was built
+    // with, so the moment there were two components the dock began warning
+    // "unknown key" about the panel's settings and would have warned about
+    // every future component's too. A program complaining about configuration
+    // that is not its own is noise, and noise in a diagnostic channel is how
+    // real diagnostics stop being read.
+    //
+    // Declaring nothing keeps the old behaviour of reporting every unknown key,
+    // which is what `lucid-tokens doctor` and the settings application want:
+    // something has to see the whole file, and a typo in a namespace no
+    // component claims is exactly what a doctor is for.
+    void own_namespace(const std::string& prefix);
+
     // Load layers 1..3 from disk. Missing files are not errors -- a system with
     // no config at all is a valid system that renders defaults.
     void load(const std::string& user_dir,
@@ -122,11 +141,13 @@ class Config {
   private:
     struct Entry { Value value; Layer layer; std::string file; };
 
+    bool reports_unknown(const std::string& key) const;
     void load_dir(const std::string& dir, Layer layer);
     void load_file(const std::string& path, Layer layer);
     void put(const std::string& key, Value v, Layer layer, const std::string& file);
 
     const Schema* schema_;
+    std::vector<std::string> owned_;   // empty means "report everything"
     std::vector<std::pair<std::string, Entry>> entries_;
     mutable std::vector<Diagnostic> diags_;
 };
