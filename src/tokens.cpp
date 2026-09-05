@@ -140,8 +140,21 @@ const Schema& default_schema() {
         num("dock.background-opacity",  0.4,   0.0,   1.0, "Panel background alpha");
         num("dock.bounce-height",      40.0,   0.0, 200.0, "Launch bounce height, logical px");
         num("dock.bounce-duration",     0.4,   0.0,   3.0, "Launch bounce duration, seconds");
-        num("dock.magnify-tau",        0.055,  0.0,   1.0, "Pointer tracking time constant, seconds");
-        num("dock.release-tau",        0.135,  0.0,   2.0, "Shrink-on-leave time constant, seconds");
+        // The dock's easing is a damped spring, not exponential decay. It was
+        // dock.magnify-tau and dock.release-tau, and those keys described a
+        // mechanism the dock deleted: two time constants cannot express a
+        // spring, and having one of them also meant tracking speed and release
+        // speed were the same control, which is the bug that motivated the
+        // change. Marked replaced_by so a config carrying the old keys is
+        // migrated rather than silently ignored.
+        num("dock.spring-omega",       30.0,   1.0, 120.0,
+            "Undamped natural frequency, rad/s. Higher reacts quicker; the feel is unchanged");
+        num("dock.spring-zeta",         0.783, 0.1,   2.0,
+            "Damping ratio. Below 1 the motion arrives by overshooting slightly rather than creeping");
+        out->add({"dock.magnify-tau", Type::Double, 0.055, 0.0, 1.0,
+                  "Removed: the dock eases with a spring", 1, "dock.spring-omega"});
+        out->add({"dock.release-tau", Type::Double, 0.135, 0.0, 2.0,
+                  "Removed: the dock eases with a spring", 1, "dock.spring-omega"});
         num("dock.indicator-size",      4.0,   0.0,  24.0, "Running-app dot size, logical px");
         out->add({"dock.enabled", Type::Bool, true, {}, {}, "Show the dock", 1, {}});
         return out;
