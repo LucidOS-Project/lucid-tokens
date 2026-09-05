@@ -129,9 +129,23 @@ const Schema& default_schema() {
         auto num = [&](const char* k, double def, double lo, double hi, const char* doc) {
             out->add({k, Type::Double, def, lo, hi, doc, 1, {}});
         };
-        num("dock.icon-size",          57.6,  16.0, 256.0, "Icon size at rest, logical px");
-        num("dock.magnify-scale",       2.0,   1.0,   4.0, "Magnified size as a multiple of icon size");
-        num("dock.magnify-range",       6.0,   1.0,  12.0, "Influence radius, in icon widths");
+        // These three ranges are not taste, they are what the dock can contain.
+        //
+        // The dock's surface is a compile-time constant sized for the largest
+        // configuration it accepts -- that is what stops it walking down the
+        // screen when magnification changes -- so an icon larger than
+        // MAX_ICON_SIZE, or a scale above MAX_MAX_SCALE, overflows a surface
+        // that cannot grow, and the icons are simply clipped.
+        //
+        // Because a range here is *enforced* by clamping rather than merely
+        // advertised, the range is the thing that keeps a config file from
+        // producing a broken dock. A range wider than the consumer's real
+        // limit is therefore not a harmless approximation: it is the safety
+        // claim failing at the exact point it is supposed to hold. These were
+        // 256, 4.0 and 12.0, all of which the dock cannot honour.
+        num("dock.icon-size",          57.6,  24.0,  80.0, "Icon size at rest, logical px");
+        num("dock.magnify-scale",       2.0,   1.0,   3.0, "Magnified size as a multiple of icon size");
+        num("dock.magnify-range",       6.0,   1.5,   8.0, "Influence radius, in icon widths");
         num("dock.item-gap",           10.0,   0.0,  64.0, "Gap between icons, logical px");
         num("dock.padding-x",          10.0,   0.0,  64.0, "Panel horizontal padding");
         num("dock.padding-y",           8.0,   0.0,  64.0, "Panel vertical padding");
