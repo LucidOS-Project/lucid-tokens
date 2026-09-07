@@ -152,6 +152,17 @@ const Schema& default_schema() {
         num("dock.bottom-margin",       8.0,   0.0, 256.0, "Gap between dock and screen edge");
         num("dock.corner-radius",      19.0,   0.0,  64.0, "Panel corner radius");
         num("dock.background-opacity",  0.4,   0.0,   1.0, "Panel background alpha");
+        // The dock's panel was white with an alpha and no way to say
+        // otherwise, so a desktop whose panel is dark had a light dock beside
+        // it and no setting to reconcile them. Default white, which is what it
+        // has always drawn: a dock dropped onto another desktop looks exactly
+        // as it did, and LucidOS says something different in its own layer.
+        // Empty means "follow desktop.color-scheme", which is what almost
+        // everybody wants: one switch that moves the whole desktop rather than
+        // a colour per component that has to be kept in step by hand.
+        out->add({"dock.background-colour", Type::String, std::string(""),
+                  {}, {}, "Panel background colour, hex. Empty follows desktop.color-scheme",
+                  1, {}});
         num("dock.bounce-height",      40.0,   0.0, 200.0, "Launch bounce height, logical px");
         num("dock.bounce-duration",     0.4,   0.0,   3.0, "Launch bounce duration, seconds");
         // The dock's easing is a damped spring, not exponential decay. It was
@@ -216,6 +227,11 @@ const Schema& default_schema() {
                   {}, {}, "Wallpaper image path", 1, {}});
         out->add({"desktop.wallpaper-colour", Type::String, std::string("#2f6fb0"),
                   {}, {}, "Colour shown where the wallpaper cannot be loaded", 1, {}});
+        // The one switch. Light by default because that is what LucidOS looks
+        // like; the components derive their own palettes from it rather than
+        // each carrying a colour that somebody has to remember to change twice.
+        out->add({"desktop.color-scheme", Type::String, std::string("light"),
+                  {}, {}, "light or dark. Every LucidOS surface follows it", 1, {}});
         out->add({"desktop.wallpaper-mode", Type::String, std::string("fill"),
                   {}, {}, "How the wallpaper is fitted: stretch, fit, fill, center, tile", 1, {}});
 
