@@ -231,9 +231,11 @@ const Schema& default_schema() {
         // like; the components derive their own palettes from it rather than
         // each carrying a colour that somebody has to remember to change twice.
         out->add({"desktop.color-scheme", Type::String, std::string("light"),
-                  {}, {}, "light or dark. Every LucidOS surface follows it", 1, {}});
+                  {}, {}, "light or dark. Every LucidOS surface follows it", 1, {},
+                  {"light", "dark"}});
         out->add({"desktop.wallpaper-mode", Type::String, std::string("fill"),
-                  {}, {}, "How the wallpaper is fitted: stretch, fit, fill, center, tile", 1, {}});
+                  {}, {}, "How the wallpaper is fitted", 1, {},
+                  {"stretch", "fit", "fill", "center", "tile"}});
 
         // Empty means "whatever the desktop is set to", which is the right
         // default for a dock installed on KDE or sway where LucidOS's icons may
@@ -369,6 +371,25 @@ void Config::load_file(const std::string& path, Layer layer) {
                 diags_.push_back({key, path, "value " + to_string(v) + " out of range",
                                   "clamped to " + std::to_string(n)});
                 v = (def->type == Type::Int) ? Value{static_cast<std::int64_t>(n)} : Value{n};
+            }
+        }
+
+        // The same idea for a closed set: a value that is not one of them is
+        // replaced by the default, not refused. "colour-scheme = drak" should
+        // give you a light desktop and a diagnostic, not a session that will
+        // not start.
+        if (!def->choices.empty() && def->type == Type::String) {
+            const std::string got = std::get<std::string>(v);
+            if (std::find(def->choices.begin(), def->choices.end(), got) ==
+                def->choices.end()) {
+                std::string legal;
+                for (const auto& ch : def->choices) {
+                    if (!legal.empty()) legal += ", ";
+                    legal += ch;
+                }
+                diags_.push_back({key, path, "'" + got + "' is not one of: " + legal,
+                                  "using " + to_string(def->default_value)});
+                continue;
             }
         }
 

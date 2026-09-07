@@ -52,6 +52,16 @@ struct KeyDef {
     std::string summary;
     int since = 1;                // schema version that introduced it
     std::string replaced_by;      // set when deprecated; migration target
+
+    // A closed set of legal values, for a String key whose range is not free
+    // text -- "light or dark", not "a hex colour". Empty means free text.
+    //
+    // This is here for the same reason min and max are: the alternative is a
+    // settings window that hardcodes the list, and then there are two places
+    // that know what a colour scheme can be. One of them goes stale, and the
+    // symptom is a dropdown offering a value the resolver falls back out of.
+    // Enforced on load the way a range is -- by substitution, never rejection.
+    std::vector<std::string> choices{};
 };
 
 // What happened during load that the user may need to know about. Never fatal.

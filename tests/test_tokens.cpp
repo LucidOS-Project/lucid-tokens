@@ -4,12 +4,14 @@
 // rendered result, so this is the file that has to be trustworthy.
 #include "lucid/tokens.h"
 
+#include <algorithm>
 #include <cstdio>
 #include <filesystem>
 #include <fstream>
 #include <random>
 #include <string>
 #include <vector>
+#include <variant>
 
 using namespace lucid;
 
@@ -152,6 +154,51 @@ int main() {
         check(c.get_double("dock.corner-radius") == 64.0, "over-max value clamps to max");
         check(c.get_double("dock.item-gap") == 0.0, "under-min value clamps to min");
         check(c.diagnostics().size() >= 4, "and every one of them is reported");
+    }
+
+    std::puts("a closed set is a closed set");
+    {
+        // A settings window can only offer light and dark if something
+        // guarantees nothing else survives a load. Otherwise the guarantee is
+        // a comment, and a hand-edited config quietly puts the desktop into a
+        // scheme no component knows how to draw.
+        write(user / "90-user.ini",
+              "[desktop]\n"
+              "color-scheme = drak\n"
+              "wallpaper-mode = fill\n");
+        Config c(default_schema());
+        c.load(user.string(), distro.string());
+        check(c.get_string("desktop.color-scheme") == "light",
+              "a value outside the set falls back to the default");
+        check(c.get_string("desktop.wallpaper-mode") == "fill",
+              "a value inside it is kept");
+        bool told = false;
+        for (const auto& d : c.diagnostics()) {
+            if (d.key == "desktop.color-scheme" &&
+                d.problem.find("not one of") != std::string::npos) told = true;
+        }
+        check(told, "and the typo is named, with the legal values");
+
+        write(user / "90-user.ini", "[desktop]\ncolor-scheme = dark\n");
+        Config d2(default_schema());
+        d2.load(user.string(), distro.string());
+        check(d2.get_string("desktop.color-scheme") == "dark", "dark is one of them");
+
+        // Every key that declares choices must have a default inside its own
+        // set, or the fallback above lands somewhere illegal.
+        bool consistent = true;
+        for (const auto& def : default_schema().keys()) {
+            if (def.choices.empty()) continue;
+            const auto* got = std::get_if<std::string>(&def.default_value);
+            if (got == nullptr ||
+                std::find(def.choices.begin(), def.choices.end(), *got) ==
+                    def.choices.end()) {
+                consistent = false;
+            }
+        }
+        check(consistent, "every closed set contains its own default");
+
+        std::filesystem::remove(user / "90-user.ini");
     }
 
     std::puts("fuzz: no input makes resolution fail");
