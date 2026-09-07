@@ -1,3 +1,12 @@
 lucid-tokens
 test
-*.o
+liblucidtokens.a
+tokens.o
+debian/.debhelper/
+debian/lucid-tokens/
+debian/liblucid-tokens-dev/
+debian/tmp/
+debian/files
+debian/*.substvars
+debian/*.debhelper.log
+debian/debhelper-build-stamp

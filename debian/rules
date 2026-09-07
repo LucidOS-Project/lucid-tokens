@@ -1,0 +1,15 @@
+#!/usr/bin/make -f
+export DEB_BUILD_MAINT_OPTIONS = hardening=+all
+
+%:
+	dh $@
+
+# The Makefile installs everything into one tree; dh_install splits it into the
+# two binary packages by path.
+override_dh_auto_install:
+	$(MAKE) install DESTDIR=$(CURDIR)/debian/tmp PREFIX=/usr
+
+# The test needs no display and no session, so there is no reason not to run it
+# in the build.
+override_dh_auto_test:
+	$(MAKE) check

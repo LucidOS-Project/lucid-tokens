@@ -1,0 +1,41 @@
+Source: lucid-tokens
+Section: x11
+Priority: optional
+Maintainer: Javid Medina <javidamedina@gmail.com>
+Build-Depends: debhelper-compat (= 13)
+Standards-Version: 4.6.2
+Homepage: https://github.com/LucidOS-Project/lucid-tokens
+Rules-Requires-Root: no
+
+Package: lucid-tokens
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: the LucidOS configuration model, and its command line
+ A layered resolver for desktop settings. A value stops being a magic number
+ inside one program and becomes a setting the whole desktop can see, document,
+ validate, revert and say where it came from.
+ .
+ Three layers, resolved in order: the compiled-in defaults, the distribution's
+ opinions in /usr/share/lucid/profile.d, and the user's in
+ ~/.config/lucid/profile.d. Every key declares a default and bounds, and values
+ outside them are clamped rather than trusted. Every layer's value is kept
+ rather than only the winning one, so undoing a user's change falls back to the
+ distribution's rather than past it.
+ .
+ This package carries the lucid-tokens command, which lists, sets, resets and
+ explains keys -- including which layer a value came from.
+
+Package: liblucid-tokens-dev
+Section: libdevel
+Architecture: any
+Depends: ${misc:Depends}
+Description: the LucidOS configuration model -- header and static library
+ Development files for lucid-tokens.
+ .
+ A static library rather than a shared object, deliberately, while the
+ interface is still moving: a .so is a promise about an ABI, and making that
+ promise before the API has settled is worse than not making it.
+ .
+ It exists so that lucid-bar and lucid-panel can build against this rather than
+ vendoring the source, which is what they did before -- and which meant a
+ changed default required every consumer to be rebuilt and re-uploaded.

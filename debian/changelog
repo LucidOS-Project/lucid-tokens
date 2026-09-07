@@ -1,0 +1,12 @@
+lucid-tokens (0.1.0) resolute; urgency=medium
+
+  * First packaged release. Two binary packages: lucid-tokens for the command
+    line, and liblucid-tokens-dev for the header and a static library.
+  * The library is the point. lucid-bar and lucid-panel vendored this as a
+    git submodule and compiled tokens.cpp straight in, so changing a default
+    meant rebuilding and re-uploading both consumers. They can build against
+    it now.
+  * Static rather than shared while the interface is still moving. A shared
+    object is a promise about an ABI and this one is not ready to make it.
+
+ -- Javid Medina <javidamedina@gmail.com>  Mon, 07 Sep 2026 04:40:00 -0400
