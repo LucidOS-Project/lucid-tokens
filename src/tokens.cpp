@@ -230,6 +230,31 @@ const Schema& default_schema() {
         // The one switch. Light by default because that is what LucidOS looks
         // like; the components derive their own palettes from it rather than
         // each carrying a colour that somebody has to remember to change twice.
+        // How large everything is drawn.
+        //
+        // A laptop with a dense screen renders a 28-pixel panel 28 physical
+        // pixels tall, which on a 4K 14-inch display is a strip you cannot
+        // read and a dock you cannot hit. Every desktop has this problem and
+        // the ones that solve it ship a display setting; LucidOS shipped none,
+        // so there was no way to change it at all -- not a bad default, an
+        // absent control.
+        //
+        // Bounded at 3: beyond that a scale is a mistake rather than a
+        // preference, and clamping is what this resolver does with a number
+        // outside its range.
+        //
+        // NOTHING APPLIES THIS YET, and the reason is worth recording. labwc
+        // speaks zwlr_output_manager_v1, which is the protocol that sets an
+        // output's scale -- but no client that speaks it is packaged for 26.04:
+        // no wlr-randr, no kanshi, no wdisplays. And labwc takes no output
+        // configuration of its own; the only scale in its manual belongs to the
+        // magnifier. So the key exists here first, because a setting with
+        // nowhere to live is worse than one whose applier is still being
+        // written, and because lucid-settings generates its controls from this
+        // schema -- the day something applies it, the control is already there.
+        num("desktop.scale", 1.0, 0.5, 3.0,
+            "How large everything is drawn. 1 is normal, 1.25 and 1.5 suit dense screens");
+
         out->add({"desktop.color-scheme", Type::String, std::string("light"),
                   {}, {}, "light or dark. Every LucidOS surface follows it", 1, {},
                   {"light", "dark"}});
