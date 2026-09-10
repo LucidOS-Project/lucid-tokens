@@ -191,6 +191,30 @@ const Schema& default_schema() {
             "Fraction of the icon box the artwork fills; 0 leaves icons untouched");
         out->add({"dock.enabled", Type::Bool, true, {}, {}, "Show the dock", 1, {}});
 
+        // The minimise animation. Its duration is measured, not chosen -- 451ms
+        // -- so the control is a multiplier on it rather than a duration of its
+        // own, and bigger is SLOWER because it multiplies a duration and not a
+        // rate. The effect this copies has the same setting with the same
+        // meaning and the same limits, which is where the range comes from.
+        num("dock.genie-speed",         1.0,   0.25,  2.0,
+            "Minimise animation duration, as a multiple of its measured 451ms; bigger is slower");
+        // Off is a real requirement, not a preference. Until this key there was
+        // no way to stop the animation at all -- only to slow it down, which is
+        // the wrong direction for anyone who asked for less motion. A desktop
+        // that cannot turn its animations off has an accessibility bug, and the
+        // dock still has to do the minimise either way.
+        out->add({"dock.genie-enabled", Type::Bool, true, {}, {},
+                  "Animate minimise and restore; off minimises with no animation", 1, {}});
+        // Animating a minimise the dock did not start -- a window's own titlebar
+        // button -- is not free. The window's pixels are gone by the time the
+        // dock is told, so a picture of the screen has to be kept from
+        // beforehand and refreshed as windows move: one screen capture every
+        // half second while a window is open. Off, those minimises simply
+        // happen, and the capture stops.
+        out->add({"dock.genie-foreign-minimise", Type::Bool, true, {}, {},
+                  "Animate minimises started from a window's own titlebar; costs a periodic screen capture",
+                  1, {}});
+
         // The panel: the second surface, and the reason the schema is a schema
         // rather than a header in the dock. These keys are read by a different
         // process, on a different edge of the screen, from the same files --
