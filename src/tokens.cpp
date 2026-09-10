@@ -126,8 +126,11 @@ const Schema& default_schema() {
     static const Schema* s = [] {
         auto* out = new Schema();
         out->set_version(1);
-        auto num = [&](const char* k, double def, double lo, double hi, const char* doc) {
-            out->add({k, Type::Double, def, lo, hi, doc, 1, {}});
+        // `title` is what a settings window calls the key. Left off, the window
+        // derives one from the key name, which is right for almost all of these.
+        auto num = [&](const char* k, double def, double lo, double hi, const char* doc,
+                       const char* title = "") {
+            out->add({k, Type::Double, def, lo, hi, doc, 1, {}, {}, title});
         };
         // These three ranges are not taste, they are what the dock can contain.
         //
@@ -197,14 +200,16 @@ const Schema& default_schema() {
         // rate. The effect this copies has the same setting with the same
         // meaning and the same limits, which is where the range comes from.
         num("dock.genie-speed",         1.0,   0.25,  2.0,
-            "Minimise animation duration, as a multiple of its measured 451ms; bigger is slower");
+            "Minimise animation duration, as a multiple of its measured 451ms; bigger is slower",
+            "Minimise duration");
         // Off is a real requirement, not a preference. Until this key there was
         // no way to stop the animation at all -- only to slow it down, which is
         // the wrong direction for anyone who asked for less motion. A desktop
         // that cannot turn its animations off has an accessibility bug, and the
         // dock still has to do the minimise either way.
         out->add({"dock.genie-enabled", Type::Bool, true, {}, {},
-                  "Animate minimise and restore; off minimises with no animation", 1, {}});
+                  "Animate minimise and restore; off minimises with no animation", 1, {}, {},
+                  "Animate minimising"});
         // Animating a minimise the dock did not start -- a window's own titlebar
         // button -- is not free. The window's pixels are gone by the time the
         // dock is told, so a picture of the screen has to be kept from
@@ -213,7 +218,7 @@ const Schema& default_schema() {
         // happen, and the capture stops.
         out->add({"dock.genie-foreign-minimise", Type::Bool, true, {}, {},
                   "Animate minimises started from a window's own titlebar; costs a periodic screen capture",
-                  1, {}});
+                  1, {}, {}, "Animate the window's own minimise button"});
 
         // The panel: the second surface, and the reason the schema is a schema
         // rather than a header in the dock. These keys are read by a different

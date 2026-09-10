@@ -5,6 +5,7 @@
 #include "lucid/tokens.h"
 
 #include <algorithm>
+#include <cctype>
 #include <cstdio>
 #include <filesystem>
 #include <fstream>
@@ -197,6 +198,31 @@ int main() {
             }
         }
         check(consistent, "every closed set contains its own default");
+
+        // A title is optional -- most keys derive a good one from their name --
+        // but a declared one has to survive into the schema, because a settings
+        // window reading it is the only reason it exists.
+        const auto* speed = default_schema().find("dock.genie-speed");
+        const auto* size = default_schema().find("dock.icon-size");
+        check(speed != nullptr && speed->title == "Minimise duration",
+              "a key can say what a settings window should call it");
+        check(size != nullptr && size->title.empty(),
+              "and a key that says nothing leaves the window to derive one");
+
+        // A title that merely repeats what the key name would derive to is
+        // worse than none: it is a second copy to keep in step. Catch it here
+        // rather than in review.
+        bool titles_earn_their_keep = true;
+        for (const auto& def : default_schema().keys()) {
+            if (def.title.empty()) continue;
+            std::string derived = def.key.substr(def.key.find('.') + 1);
+            for (char& c : derived) {
+                if (c == '-') c = ' ';
+            }
+            if (!derived.empty()) derived[0] = static_cast<char>(std::toupper(derived[0]));
+            if (def.title == derived) titles_earn_their_keep = false;
+        }
+        check(titles_earn_their_keep, "no title just restates the key name");
 
         std::filesystem::remove(user / "90-user.ini");
     }

@@ -62,6 +62,19 @@ struct KeyDef {
     // symptom is a dropdown offering a value the resolver falls back out of.
     // Enforced on load the way a range is -- by substitution, never rejection.
     std::vector<std::string> choices{};
+
+    // What a settings window should call this key. Empty means "derive it from
+    // the key", which is what every key did until now: drop the namespace,
+    // dashes to spaces, capitalise. That works for icon-size and it does not
+    // work for genie-foreign-minimise, which derives to "Genie foreign
+    // minimise" -- three words of implementation vocabulary in a row, naming an
+    // effect the user has never heard called a genie.
+    //
+    // Here rather than in the settings window for the same reason the summary
+    // and the range are here: a key is described once, in the place that also
+    // validates it, or the two drift and the window ends up documenting a key
+    // that no longer means that.
+    std::string title{};
 };
 
 // What happened during load that the user may need to know about. Never fatal.
