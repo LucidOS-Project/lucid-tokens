@@ -254,7 +254,13 @@ const Schema& default_schema() {
         out->add({"desktop.wallpaper", Type::String,
                   std::string("/usr/share/backgrounds/lucid/lucid.png"),
                   {}, {}, "Wallpaper image path", 1, {}});
-        out->add({"desktop.wallpaper-colour", Type::String, std::string("#2f6fb0"),
+        // #052936 is the single most common colour in the default wallpaper --
+        // 15.7% of lucidos-aurora.jpg, the deep water and sky it is mostly made
+        // of. It was #2f6fb0, hue 210, a blue: 50 degrees off a photograph at
+        // hue 192, so the colour standing in for the wallpaper was a colour
+        // LucidOS does not otherwise contain. Nobody sees this often, which is
+        // exactly why it was wrong for so long.
+        out->add({"desktop.wallpaper-colour", Type::String, std::string("#052936"),
                   {}, {}, "Colour shown where the wallpaper cannot be loaded", 1, {}});
         // The one switch. Light by default because that is what LucidOS looks
         // like; the components derive their own palettes from it rather than
