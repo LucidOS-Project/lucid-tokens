@@ -245,11 +245,22 @@ const Schema& default_schema() {
         // somebody dragging the panel to 0.2 for a translucent desktop gets an
         // unreadable control centre as a side effect they never asked for.
         //
-        // So: its own key, and a bottom of 0.6 that the resolver clamps to.
-        // Ranges here are enforced rather than advertised, which is what makes
-        // this a guarantee that the controls stay legible instead of advice
-        // about it.
-        num("panel.popover-opacity",     0.68,  0.6,   1.0,
+        // The floor was 0.6 and the default 0.68, and both were set before the
+        // popover had a blurred capture behind it. At that point the veil was
+        // the ONLY thing making text readable over a wallpaper, so a low alpha
+        // really would have hidden the controls.
+        //
+        // With a backdrop the blur does that work -- it removes the
+        // high-frequency detail text has to compete with -- and the veil is
+        // mostly covering up the thing it was there to substitute for. At 0.68
+        // only 32% of the captured picture survives, which is why the surface
+        // reads as a flat pane rather than as glass picking up the colours
+        // behind it. This is macOS's arrangement and it is the right way round:
+        // heavy blur, light tint, not light blur and a heavy tint.
+        //
+        // 0.25 is still a floor rather than none, because a popover with no
+        // tint at all is a hole in the screen with text floating in it.
+        num("panel.popover-opacity",     0.42,  0.25,  1.0,
             "Background alpha for the panel's popovers, including the control centre");
 
         // Whether a popover follows the desktop's scheme or picks its own.
