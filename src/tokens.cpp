@@ -288,7 +288,25 @@ const Schema& default_schema() {
         // panel's opinion, it is the desktop's, and a key every surface reads is
         // the strongest form of the claim this schema makes: one value, one
         // place to change it, every component follows.
-        out->add({"desktop.font-family", Type::String, std::string("Inter"),
+        // Manrope, and this also settles a disagreement: lucid_panel.cpp's
+        // hardcoded fallback was already Manrope while this said Inter, so
+        // whichever was right, one of them was wrong.
+        //
+        // Inter is the safe answer and reads like it -- it is also the face
+        // half the interfaces on the internet already use. Manrope has actual
+        // letterforms, runs slightly wider so rows breathe, and keeps a clear
+        // weight difference between a row's title and its state line, which is
+        // what makes the list scannable.
+        //
+        // Compared on screen against Inter, Ubuntu and Sora. Ubuntu is
+        // legible and unmistakably Ubuntu's, which is somebody else's identity
+        // and the same problem the icon set has. Sora is disqualified on a
+        // packaging defect rather than on looks: fonts-sora ships a Regular
+        // but `fc-match "Sora:weight=regular"` still answers ExtraBold, so
+        // every label in the desktop would render heavy. Karla and Cabin were
+        // not compared -- the capture harness would not hold still long
+        // enough -- and remain worth a look.
+        out->add({"desktop.font-family", Type::String, std::string("Manrope"),
                   {}, {}, "Interface font family", 1, {}});
         num("desktop.font-size",        12.0,   6.0,  32.0, "Interface font size, pt");
 
