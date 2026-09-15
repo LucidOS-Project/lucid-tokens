@@ -232,6 +232,26 @@ const Schema& default_schema() {
         num("panel.margin",              8.0,   0.0,  64.0,
             "Gap between the panel and the screen edges; 0 makes it flush");
 
+        // The panel's popovers -- the notice, and the control centre -- are a
+        // SEPARATE alpha from the panel's own, and the reason is the floor
+        // rather than the default.
+        //
+        // panel.background-opacity is 0.4 and that is right for a 28-pixel
+        // strip carrying a clock and four glyphs, which also compensates with
+        // a text-shadow. A popover is ten times the area and carries 10.5px
+        // state lines and a 5px slider track, with no compositor blur behind
+        // it to lean on -- labwc has none, and a control nobody can find is
+        // worse than an opaque surface. Sharing the panel's key would mean
+        // somebody dragging the panel to 0.2 for a translucent desktop gets an
+        // unreadable control centre as a side effect they never asked for.
+        //
+        // So: its own key, and a bottom of 0.6 that the resolver clamps to.
+        // Ranges here are enforced rather than advertised, which is what makes
+        // this a guarantee that the controls stay legible instead of advice
+        // about it.
+        num("panel.popover-opacity",     0.68,  0.6,   1.0,
+            "Background alpha for the panel's popovers, including the control centre");
+
         // Desktop-wide rather than per-surface. A font is not the dock's or the
         // panel's opinion, it is the desktop's, and a key every surface reads is
         // the strongest form of the claim this schema makes: one value, one
@@ -262,6 +282,34 @@ const Schema& default_schema() {
         // exactly why it was wrong for so long.
         out->add({"desktop.wallpaper-colour", Type::String, std::string("#052936"),
                   {}, {}, "Colour shown where the wallpaper cannot be loaded", 1, {}});
+        // The colour a control uses to say it is ON. Until now there was none,
+        // which was not an oversight so much as an absence nobody had needed
+        // yet: a dock draws icons, a panel draws a clock, and neither has a
+        // state to report. A control centre is the first surface that does,
+        // and every filled tile in it needs this.
+        //
+        // #0d7759 is the aurora itself -- hue 163, sampled from the green
+        // band of lucidos-aurora.jpg rather than chosen. Only its lightness
+        // was moved, down to the darkest point that still clears 4.5:1
+        // against white, because a filled control carries an 11.5px label and
+        // that is normal-size text: the vivid version measured 3.22:1 and was
+        // never available.
+        //
+        // Why not a blue. Windows is blue, macOS is blue, GNOME is blue, and
+        // the first attempt here was #1c222e's neighbourhood at hue 220 -- a
+        // slate 24 degrees off everything else on the desktop. The sky in that
+        // photograph is genuinely the larger share of its saturated pixels
+        // (50.1% in 200-210 degrees against about 30% across 150-180), so blue
+        // was defensible. It was just also the answer everybody else already
+        // gave. The aurora is the part of that image anyone would describe
+        // first, and it is nobody else's accent.
+        //
+        // It is a token and not a constant because an accent is the single
+        // thing people most want to change, and lucid-settings generates its
+        // controls from this schema -- so the colour control exists the moment
+        // this line does.
+        out->add({"desktop.accent-colour", Type::String, std::string("#0d7759"),
+                  {}, {}, "Colour a control uses to show it is on", 1, {}});
         // The one switch. Light by default because that is what LucidOS looks
         // like; the components derive their own palettes from it rather than
         // each carrying a colour that somebody has to remember to change twice.
