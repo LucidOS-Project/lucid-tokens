@@ -258,9 +258,13 @@ const Schema& default_schema() {
         // behind it. This is macOS's arrangement and it is the right way round:
         // heavy blur, light tint, not light blur and a heavy tint.
         //
-        // 0.25 is still a floor rather than none, because a popover with no
-        // tint at all is a hole in the screen with text floating in it.
-        num("panel.popover-opacity",     0.42,  0.25,  1.0,
+        // 0.35 by eye against the aurora, comparing 0.68, 0.42 and 0.26 side
+        // by side: 0.68 is a pane, 0.26 starts costing the dim state lines
+        // their contrast, and this sits between them.
+        //
+        // 0.25 is the floor rather than none, because a popover with no tint
+        // at all is a hole in the screen with text floating in it.
+        num("panel.popover-opacity",     0.35,  0.25,  1.0,
             "Background alpha for the panel's popovers, including the control centre");
 
         // Whether a popover follows the desktop's scheme or picks its own.
