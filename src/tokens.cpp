@@ -252,6 +252,23 @@ const Schema& default_schema() {
         num("panel.popover-opacity",     0.68,  0.6,   1.0,
             "Background alpha for the panel's popovers, including the control centre");
 
+        // Whether a popover follows the desktop's scheme or picks its own.
+        //
+        // "follow" is the default and it is the coherent answer: a light panel
+        // with a dark surface hanging off it reads as two desktops. But the
+        // argument at the top of lucid_panel.cpp's install_css -- that a
+        // surface carrying text has to be legible against a wallpaper it does
+        // not choose -- applies with more force to a 330x440 popover holding
+        // twenty labels than it ever did to a 28-pixel strip holding a clock.
+        // On a pale wallpaper a light popover has very little to separate it.
+        //
+        // So it is a key rather than a decision made once in C++: somebody who
+        // wants every popover dark on a light desktop can say so, and the
+        // default still matches the panel above it.
+        out->add({"panel.popover-scheme", Type::String, std::string("follow"),
+                  {}, {}, "Popover colour scheme: follow the desktop, or force one",
+                  1, {}, {"follow", "light", "dark"}});
+
         // Desktop-wide rather than per-surface. A font is not the dock's or the
         // panel's opinion, it is the desktop's, and a key every surface reads is
         // the strongest form of the claim this schema makes: one value, one
