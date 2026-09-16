@@ -138,6 +138,9 @@ const std::vector<std::string>& default_page_order() {
         "Dock",
         "Panel",
         "Control Centre",
+        // Not a schema page -- it has no keys -- but its place in the order is
+        // decided here with the rest.
+        "Storage",
     };
     return *order;
 }
