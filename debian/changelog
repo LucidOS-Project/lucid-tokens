@@ -1,3 +1,10 @@
+lucid-tokens (0.1.1) resolute; urgency=medium
+
+  * desktop.main-output: which screen the dock and panel live on, by
+    connector name. Empty lets the compositor choose.
+
+ -- Javid Medina <javidamedina@gmail.com>  Wed, 16 Sep 2026 10:30:00 -0400
+
 lucid-tokens (0.1.0) resolute; urgency=medium
 
   * First packaged release. Two binary packages: lucid-tokens for the command
