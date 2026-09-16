@@ -1,3 +1,12 @@
+lucid-tokens (0.1.2) resolute; urgency=medium
+
+  * desktop.clock-format, 12-hour by default. Every surface that draws a time
+    follows it, so the panel and the lock screen cannot disagree.
+  * Network is listed in Connectivity, above Bluetooth, because the page it
+    names now exists.
+
+ -- Javid Medina <javidamedina@gmail.com>  Wed, 16 Sep 2026 10:30:00 -0400
+
 lucid-tokens (0.1.1) resolute; urgency=medium
 
   * desktop.main-output: which screen the dock and panel live on, by
