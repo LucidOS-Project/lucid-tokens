@@ -163,16 +163,45 @@ class Schema {
 // constant in the dock.
 const Schema& default_schema();
 
-// The order pages appear in a settings window, outermost first.
+// A cluster of pages in a settings window's sidebar, with a heading above it.
 //
-// Not derivable from the keys. Page order was falling out of the order keys
-// happen to be DECLARED, which put Dock, Panel and Control Centre first purely
-// because the dock was the first component written -- so a settings window
-// opened onto the dock's twenty-two knobs and buried "Appearance" below them.
+// NOT KeyDef::group, which clusters ROWS WITHIN a page. This clusters pages
+// within the sidebar, and the two are different scales of the same idea: one
+// says "these three sliders are all about size", the other says "these two
+// pages are both about getting on a network".
 //
-// The order is general to specific: what the desktop looks like, then the
-// screen, then the individual surfaces. Dock and Panel are the names of
-// components, and a component is the last thing somebody is looking for.
+// A flat list stops working somewhere around a dozen entries. Eight was fine,
+// which is why this did not exist; the moment settings covers sound, power,
+// input and the rest it is sixteen or twenty, and a wall of sixteen evenly
+// spaced rows is a list somebody reads top to bottom every single time instead
+// of jumping. macOS and GNOME both cluster for this reason and neither
+// invented it.
+struct PageSection {
+    std::string title;               // "Connectivity"; empty draws no heading
+    std::vector<std::string> pages;  // in the order they appear
+};
+
+// The sidebar, top to bottom.
+//
+// The order within it is frequency times urgency, which is what every desktop
+// converges on: connectivity first because a machine that is not on a network
+// cannot do anything else, then the hardware, then how it all looks, then the
+// system. LucidOS shipped the exact inverse -- it opened on Appearance, which
+// is a page somebody visits once -- because the only settings that existed
+// were the ones describing the shell.
+//
+// Dock, Panel and Control Centre sit under Personalisation rather than at the
+// top for the same reason they were moved off the top before: they are the
+// names of components, and a component is the last thing somebody looks for.
+const std::vector<PageSection>& default_page_sections();
+
+// The same pages flattened, outermost first -- the sections in order, and the
+// pages within each in order.
+//
+// Derived from default_page_sections() rather than listed again, because two
+// lists of the same pages is one list that goes stale. It stays because it is
+// what a window sorts by, and because a page's position does not depend on
+// knowing which section it is in.
 //
 // A page not named here sorts to the end, so a category added to a key still
 // appears rather than vanishing.

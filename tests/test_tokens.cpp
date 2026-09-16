@@ -224,6 +224,46 @@ int main() {
         }
         check(titles_earn_their_keep, "no title just restates the key name");
 
+        // The sidebar's sections, and the one thing that can go silently wrong
+        // with them: a page placed in no section sorts to the end of the
+        // window, which looks like a layout bug rather than a missing entry.
+        bool flattens = true;
+        std::vector<std::string> flat;
+        for (const auto& section : default_page_sections()) {
+            for (const auto& page : section.pages) flat.push_back(page);
+        }
+        if (flat != default_page_order()) flattens = false;
+        check(flattens, "the page order is exactly the sections flattened");
+
+        bool no_duplicates = true;
+        for (std::size_t i = 0; i < flat.size(); ++i) {
+            for (std::size_t j = i + 1; j < flat.size(); ++j) {
+                if (flat[i] == flat[j]) no_duplicates = false;
+            }
+        }
+        check(no_duplicates, "no page is listed in two sections");
+
+        // Every category a key actually uses has to be placed. Without this a
+        // new page appears below the last section with no heading over it, and
+        // the person who added the category has no reason to suspect the
+        // sidebar of anything.
+        bool every_category_placed = true;
+        for (const auto& def : default_schema().keys()) {
+            if (def.category.empty() || !def.replaced_by.empty()) continue;
+            if (std::find(flat.begin(), flat.end(), def.category) == flat.end()) {
+                std::printf("    unplaced category: %s (from %s)\n",
+                            def.category.c_str(), def.key.c_str());
+                every_category_placed = false;
+            }
+        }
+        check(every_category_placed, "every category a key uses sits in a section");
+
+        bool sections_are_titled = true;
+        for (const auto& section : default_page_sections()) {
+            if (section.title.empty() || section.pages.empty()) sections_are_titled = false;
+        }
+        check(sections_are_titled, "no section is empty or unnamed");
+
         std::filesystem::remove(user / "90-user.ini");
     }
 

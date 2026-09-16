@@ -129,19 +129,44 @@ KeyDef* Schema::find_mutable(const std::string& key) {
 // lucid_dock.cpp. Ranges are what the dock can actually render sensibly, and
 // they are enforced on load so a hand-edited file cannot produce a dock that
 // is invisible or fills the screen.
-const std::vector<std::string>& default_page_order() {
-    static const std::vector<std::string>* order = new std::vector<std::string>{
-        "Appearance",
-        "Wallpaper",
-        "Display",
-        "Lock Screen",
-        "Dock",
-        "Panel",
-        "Control Centre",
-        // Not a schema page -- it has no keys -- but its place in the order is
-        // decided here with the rest.
-        "Storage",
+const std::vector<PageSection>& default_page_sections() {
+    static const std::vector<PageSection>* sections = new std::vector<PageSection>{
+        // Connectivity first, which is where every desktop puts it -- macOS,
+        // GNOME, Windows and iOS all open on Wi-Fi and Bluetooth. A machine
+        // that is not on a network cannot do the thing it was turned on for.
+        //
+        // Network belongs here and is not built. Bluetooth is, because blueman
+        // is packaged and the page can be honest about handing over; there is
+        // no equivalent for Wi-Fi -- nm-connection-editor is not something to
+        // hand somebody who has just installed an operating system -- so that
+        // page has to be real before it can be listed, and a top-of-the-list
+        // stub is worse than an absence. Top billing is a promise.
+        {"Connectivity", {"Bluetooth"}},
+
+        // Sound, Power and Keyboard belong here next to Display.
+        {"Hardware", {"Display"}},
+
+        // How it looks, including the three surfaces LucidOS draws itself.
+        {"Personalisation",
+         {"Appearance", "Wallpaper", "Dock", "Panel", "Control Centre", "Lock Screen"}},
+
+        // Neither of these configures anything -- they report -- which is why
+        // they sit at the bottom together. Storage answers "how full am I",
+        // About answers "what is this". Both are the last thing looked for and
+        // the first thing asked for when something is wrong.
+        {"System", {"Storage", "About"}},
     };
+    return *sections;
+}
+
+const std::vector<std::string>& default_page_order() {
+    static const std::vector<std::string>* order = [] {
+        auto* out = new std::vector<std::string>();
+        for (const PageSection& section : default_page_sections()) {
+            for (const std::string& page : section.pages) out->push_back(page);
+        }
+        return out;
+    }();
     return *order;
 }
 
