@@ -436,6 +436,29 @@ const Schema& default_schema() {
         num("desktop.scale", 1.0, 0.5, 3.0,
             "How large everything is drawn. 1 is normal, 1.25 and 1.5 suit dense screens");
 
+        // Which screen the dock and the panel live on.
+        //
+        // A connector name -- "DP-1", "eDP-1", "HDMI-A-2" -- because that is
+        // what the compositor calls an output and what wlr-randr prints. Not an
+        // index: indexes are the compositor's enumeration order, they are not
+        // stable across a replug, and a setting that means "whichever screen
+        // happens to be listed first today" is not a setting.
+        //
+        // Empty is the default and means "let the compositor decide", which is
+        // what LucidOS did for its whole life until now. It is also the correct
+        // behaviour for one screen, which is nearly every machine, so the
+        // common case sets nothing.
+        //
+        // A name that is not plugged in is not an error and must not be. A
+        // laptop docked at a desk names a monitor it does not have every time
+        // it is carried away, and a dock that refuses to appear because its
+        // preferred screen is at the office is worse than a dock on the wrong
+        // screen. Unmatched falls back to letting the compositor choose.
+        out->add({"desktop.main-output", Type::String, std::string(""),
+                  {}, {}, "Screen the dock and panel appear on, by connector "
+                          "name such as DP-1. Empty lets the compositor choose",
+                  1, {}, {}, "Main display"});
+
         // When the screen locks itself, and when it goes dark.
         //
         // lucid-lock has shipped since 0.1.0 and the session had nothing to
@@ -500,6 +523,7 @@ const Schema& default_schema() {
             {"desktop.wallpaper-colour",    "Wallpaper", "",      true,   30},
 
             {"desktop.scale",               "Display", "",        false,  10},
+            {"desktop.main-output",         "Display", "",        false,  20},
 
             {"desktop.lock-idle-minutes",   "Lock Screen", "",    false,  10},
             {"desktop.screen-off-minutes",  "Lock Screen", "",    false,  20},
