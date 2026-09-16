@@ -129,6 +129,19 @@ KeyDef* Schema::find_mutable(const std::string& key) {
 // lucid_dock.cpp. Ranges are what the dock can actually render sensibly, and
 // they are enforced on load so a hand-edited file cannot produce a dock that
 // is invisible or fills the screen.
+const std::vector<std::string>& default_page_order() {
+    static const std::vector<std::string>* order = new std::vector<std::string>{
+        "Appearance",
+        "Wallpaper",
+        "Display",
+        "Lock Screen",
+        "Dock",
+        "Panel",
+        "Control Centre",
+    };
+    return *order;
+}
+
 const Schema& default_schema() {
     static const Schema* s = [] {
         auto* out = new Schema();

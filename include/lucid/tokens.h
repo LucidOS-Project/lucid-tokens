@@ -149,6 +149,21 @@ class Schema {
 // constant in the dock.
 const Schema& default_schema();
 
+// The order pages appear in a settings window, outermost first.
+//
+// Not derivable from the keys. Page order was falling out of the order keys
+// happen to be DECLARED, which put Dock, Panel and Control Centre first purely
+// because the dock was the first component written -- so a settings window
+// opened onto the dock's twenty-two knobs and buried "Appearance" below them.
+//
+// The order is general to specific: what the desktop looks like, then the
+// screen, then the individual surfaces. Dock and Panel are the names of
+// components, and a component is the last thing somebody is looking for.
+//
+// A page not named here sorts to the end, so a category added to a key still
+// appears rather than vanishing.
+const std::vector<std::string>& default_page_order();
+
 class Config {
   public:
     explicit Config(const Schema& schema);
