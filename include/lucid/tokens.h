@@ -75,6 +75,42 @@ struct KeyDef {
     // validates it, or the two drift and the window ends up documenting a key
     // that no longer means that.
     std::string title{};
+
+    // Which page of a settings window this belongs on.
+    //
+    // NOT the namespace. The namespace says which component reads a key;
+    // the category says where a person looks for it, and those are different
+    // questions with different answers. desktop.lock-idle-minutes is read by
+    // the session and looked for under "Lock Screen"; panel.popover-opacity is
+    // read by the panel and looked for under "Control Centre". Deriving pages
+    // from namespaces produced three pages called Dock, Desktop and Panel,
+    // which are the names of the programs rather than of anything somebody
+    // wants to change.
+    //
+    // Empty falls back to the capitalised namespace, so a key that has not
+    // been sorted yet still appears somewhere rather than vanishing.
+    std::string category{};
+
+    // Hide behind a disclosure.
+    //
+    // The dock declares twenty-two keys and five of them are spring constants
+    // and time bases -- spring-omega, spring-zeta, magnify-tau, release-tau,
+    // icon-ink-ratio. They are real settings with real effects and they are not
+    // what anybody opens a settings window to find. A list where the fourth
+    // item is "Spring omega" teaches somebody that this window is not for them.
+    //
+    // This is the two-level pattern every settings app of any size arrives at:
+    // the ordinary set satisfies almost everyone, and the rest is one click
+    // away rather than deleted.
+    bool advanced = false;
+
+    // Where the row sits on its page. Lower first; ties keep declaration order.
+    //
+    // Declaration order alone was doing this job, which coupled "where this
+    // appears to a user" to "where I happened to type it in default_schema()".
+    // Those should be free to differ: keys are declared in the order they were
+    // invented and read in the order they matter.
+    int order = 0;
 };
 
 // What happened during load that the user may need to know about. Never fatal.
@@ -95,6 +131,11 @@ class Schema {
   public:
     void add(KeyDef def);
     const KeyDef* find(const std::string& key) const;
+
+    // Mutable lookup, for the categorisation pass at the end of
+    // default_schema(). Presentation is described once, in a table, rather
+    // than as three extra arguments on forty-one declarations.
+    KeyDef* find_mutable(const std::string& key);
     const std::vector<KeyDef>& keys() const { return keys_; }
     int version() const { return version_; }
     void set_version(int v) { version_ = v; }
