@@ -135,13 +135,23 @@ const std::vector<PageSection>& default_page_sections() {
         // GNOME, Windows and iOS all open on Wi-Fi and Bluetooth. A machine
         // that is not on a network cannot do the thing it was turned on for.
         //
-        // Network belongs here and is not built. Bluetooth is, because blueman
-        // is packaged and the page can be honest about handing over; there is
-        // no equivalent for Wi-Fi -- nm-connection-editor is not something to
-        // hand somebody who has just installed an operating system -- so that
-        // page has to be real before it can be listed, and a top-of-the-list
-        // stub is worse than an absence. Top billing is a promise.
-        {"Connectivity", {"Bluetooth"}},
+        // Network is FIRST, and it is listed now because it is built.
+        //
+        // This entry used to say Network belongs here and does not exist, on
+        // the grounds that top billing is a promise and a stub at the top of
+        // the sidebar is worse than an absence. That was right, and it is why
+        // the page had to come before the listing rather than after it.
+        //
+        // What made it possible is the one thing it could not delegate.
+        // Bluetooth hands pairing to blueman; the equivalent for Wi-Fi is
+        // nm-connection-editor, which opens on connection profiles with tabs
+        // for IPv6 and 802.1X and is no answer to "put me on the wifi". So the
+        // Network page joins a network itself, and hands off only the things
+        // that editor is genuinely better at.
+        //
+        // Before Bluetooth, because a machine with neither reaches for Wi-Fi
+        // first.
+        {"Connectivity", {"Network", "Bluetooth"}},
 
         // Sound, Power and Keyboard belong here next to Display.
         {"Hardware", {"Display"}},
