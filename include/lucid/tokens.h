@@ -104,6 +104,20 @@ struct KeyDef {
     // away rather than deleted.
     bool advanced = false;
 
+    // A heading within the page, so a long list reads as clusters.
+    //
+    // The Dock page has thirteen ordinary rows and they are not thirteen
+    // unrelated things: four are about size, two about magnification, three
+    // about how it is drawn, four about animation. Thirteen rows in one card
+    // is a list somebody scans; four short cards with headings is a page
+    // somebody reads. GNOME Settings does this on every page -- its Appearance
+    // pane is "Style" then "Background" -- and it is the difference between a
+    // generated window and a designed one.
+    //
+    // Empty means the row joins the page's first, unheaded card, which is
+    // right for a page with three rows and no need of the ceremony.
+    std::string group{};
+
     // Where the row sits on its page. Lower first; ties keep declaration order.
     //
     // Declaration order alone was doing this job, which coupled "where this

@@ -454,72 +454,74 @@ const Schema& default_schema() {
         // reads; "Control Centre" holds two the panel reads. Deriving pages
         // from namespaces gave three pages called Dock, Desktop and Panel --
         // the names of the programs.
-        struct Placement { const char* key; const char* page; bool advanced; int order; };
+        struct Placement { const char* key; const char* page; const char* group;
+                           bool advanced; int order; };
         static const Placement kPlacement[] = {
             // Appearance -- what the desktop looks like, in the order somebody
             // changes them: the big switch first, then colour, then type.
-            {"desktop.color-scheme",        "Appearance",     false,  10},
-            {"desktop.accent-colour",       "Appearance",     false,  20},
-            {"desktop.icon-theme",          "Appearance",     false,  30},
-            {"desktop.font-family",         "Appearance",     false,  40},
-            {"desktop.font-size",           "Appearance",     false,  50},
+            {"desktop.color-scheme",        "Appearance", "Style",     false,  10},
+            {"desktop.accent-colour",       "Appearance", "Style",     false,  20},
+            {"desktop.icon-theme",          "Appearance", "Style",     false,  30},
+            {"desktop.font-family",         "Appearance", "Text",     false,  40},
+            {"desktop.font-size",           "Appearance", "Text",     false,  50},
 
-            {"desktop.wallpaper",           "Wallpaper",      false,  10},
-            {"desktop.wallpaper-mode",      "Wallpaper",      false,  20},
+            {"desktop.wallpaper",           "Wallpaper", "",      false,  10},
+            {"desktop.wallpaper-mode",      "Wallpaper", "",      false,  20},
             // The fallback colour is real and almost nobody sets it: it is
             // seen only when the image cannot be read.
-            {"desktop.wallpaper-colour",    "Wallpaper",      true,   30},
+            {"desktop.wallpaper-colour",    "Wallpaper", "",      true,   30},
 
-            {"desktop.scale",               "Display",        false,  10},
+            {"desktop.scale",               "Display", "",        false,  10},
 
-            {"desktop.lock-idle-minutes",   "Lock Screen",    false,  10},
-            {"desktop.screen-off-minutes",  "Lock Screen",    false,  20},
+            {"desktop.lock-idle-minutes",   "Lock Screen", "",    false,  10},
+            {"desktop.screen-off-minutes",  "Lock Screen", "",    false,  20},
 
             // Dock. On/off, then size, then the magnification people actually
             // came for, then the parts of the animation worth exposing.
-            {"dock.enabled",                "Dock",           false,  10},
-            {"dock.icon-size",              "Dock",           false,  20},
-            {"dock.magnify-scale",          "Dock",           false,  30},
-            {"dock.magnify-range",          "Dock",           false,  40},
-            {"dock.item-gap",               "Dock",           false,  50},
-            {"dock.bottom-margin",          "Dock",           false,  60},
-            {"dock.corner-radius",          "Dock",           false,  70},
-            {"dock.background-opacity",     "Dock",           false,  80},
-            {"dock.background-colour",      "Dock",           false,  90},
-            {"dock.genie-enabled",          "Dock",           false, 100},
-            {"dock.genie-speed",            "Dock",           false, 110},
-            {"dock.bounce-height",          "Dock",           false, 120},
-            {"dock.bounce-duration",        "Dock",           false, 130},
+            {"dock.enabled",                "Dock", "",           false,  10},
+            {"dock.icon-size",              "Dock", "Size",           false,  20},
+            {"dock.magnify-scale",          "Dock", "Magnification",           false,  30},
+            {"dock.magnify-range",          "Dock", "Magnification",           false,  40},
+            {"dock.item-gap",               "Dock", "Size",           false,  50},
+            {"dock.bottom-margin",          "Dock", "Size",           false,  60},
+            {"dock.corner-radius",          "Dock", "Appearance",           false,  70},
+            {"dock.background-opacity",     "Dock", "Appearance",           false,  80},
+            {"dock.background-colour",      "Dock", "Appearance",           false,  90},
+            {"dock.genie-enabled",          "Dock", "Animation",           false, 100},
+            {"dock.genie-speed",            "Dock", "Animation",           false, 110},
+            {"dock.bounce-height",          "Dock", "Animation",           false, 120},
+            {"dock.bounce-duration",        "Dock", "Animation",           false, 130},
             // Behind the disclosure: geometry nobody tunes by eye, and the
             // spring constants, which are real settings with real effects and
             // are not what anybody opens a settings window to find. A list
             // whose fourth row is "Spring omega" teaches somebody that this
             // window is not for them.
-            {"dock.padding-x",              "Dock",           true,  200},
-            {"dock.padding-y",              "Dock",           true,  210},
-            {"dock.indicator-size",         "Dock",           true,  220},
-            {"dock.icon-ink-ratio",         "Dock",           true,  230},
-            {"dock.spring-omega",           "Dock",           true,  240},
-            {"dock.spring-zeta",            "Dock",           true,  250},
-            {"dock.magnify-tau",            "Dock",           true,  260},
-            {"dock.release-tau",            "Dock",           true,  270},
-            {"dock.genie-foreign-minimise", "Dock",           true,  280},
+            {"dock.padding-x",              "Dock", "",           true,  200},
+            {"dock.padding-y",              "Dock", "",           true,  210},
+            {"dock.indicator-size",         "Dock", "",           true,  220},
+            {"dock.icon-ink-ratio",         "Dock", "",           true,  230},
+            {"dock.spring-omega",           "Dock", "",           true,  240},
+            {"dock.spring-zeta",            "Dock", "",           true,  250},
+            {"dock.magnify-tau",            "Dock", "",           true,  260},
+            {"dock.release-tau",            "Dock", "",           true,  270},
+            {"dock.genie-foreign-minimise", "Dock", "",           true,  280},
 
-            {"panel.enabled",               "Panel",          false,  10},
-            {"panel.height",                "Panel",          false,  20},
-            {"panel.margin",                "Panel",          false,  30},
-            {"panel.corner-radius",         "Panel",          false,  40},
-            {"panel.background-opacity",    "Panel",          false,  50},
-            {"panel.padding-x",             "Panel",          true,   60},
+            {"panel.enabled",               "Panel", "",          false,  10},
+            {"panel.height",                "Panel", "Size",          false,  20},
+            {"panel.margin",                "Panel", "Size",          false,  30},
+            {"panel.corner-radius",         "Panel", "Appearance",          false,  40},
+            {"panel.background-opacity",    "Panel", "Appearance",          false,  50},
+            {"panel.padding-x",             "Panel", "",          true,   60},
 
             // The control centre is the panel's, and nobody looks for it
             // under "Panel" -- they look for the thing they opened.
-            {"panel.popover-opacity",       "Control Centre", false,  10},
-            {"panel.popover-scheme",        "Control Centre", false,  20},
+            {"panel.popover-opacity",       "Control Centre", "", false,  10},
+            {"panel.popover-scheme",        "Control Centre", "", false,  20},
         };
         for (const Placement& p : kPlacement) {
             if (KeyDef* k = out->find_mutable(p.key)) {
                 k->category = p.page;
+                k->group = p.group;
                 k->advanced = p.advanced;
                 k->order = p.order;
             }
