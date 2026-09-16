@@ -492,6 +492,21 @@ const Schema& default_schema() {
         out->add({"desktop.color-scheme", Type::String, std::string("light"),
                   {}, {}, "light or dark. Every LucidOS surface follows it", 1, {},
                   {"light", "dark"}});
+        // 12-hour by default, and that is a default rather than a preference.
+        //
+        // Most of the people LucidOS is for read a clock in 12-hour and have
+        // never chosen a format in their lives -- it is what Windows and macOS
+        // both ship with in the places most of those people are. 24-hour is
+        // right for a great many others, which is why it is here at all, but a
+        // default is what somebody gets when they never open this window, and
+        // it should be the one that needs no explanation.
+        //
+        // Every surface that draws a time follows it, so the panel and the lock
+        // screen cannot disagree about what o'clock it is.
+        out->add({"desktop.clock-format", Type::String, std::string("12-hour"),
+                  {}, {}, "Whether clocks read 4:15 or 16:15", 1, {},
+                  {"12-hour", "24-hour"}, "Clock"});
+
         out->add({"desktop.wallpaper-mode", Type::String, std::string("fill"),
                   {}, {}, "How the wallpaper is fitted", 1, {},
                   {"stretch", "fit", "fill", "center", "tile"}});
@@ -525,6 +540,10 @@ const Schema& default_schema() {
             {"desktop.icon-theme",          "Appearance", "Style",     false,  30},
             {"desktop.font-family",         "Appearance", "Text",     false,  40},
             {"desktop.font-size",           "Appearance", "Text",     false,  50},
+
+            // On Appearance rather than a page of its own: it is one key, and
+            // "how the desktop reads" is what that page is for.
+            {"desktop.clock-format",        "Appearance", "Text",     false,  60},
 
             {"desktop.wallpaper",           "Wallpaper", "",      false,  10},
             {"desktop.wallpaper-mode",      "Wallpaper", "",      false,  20},
