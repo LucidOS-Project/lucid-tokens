@@ -388,6 +388,26 @@ const Schema& default_schema() {
         num("desktop.scale", 1.0, 0.5, 3.0,
             "How large everything is drawn. 1 is normal, 1.25 and 1.5 suit dense screens");
 
+        // When the screen locks itself, and when it goes dark.
+        //
+        // lucid-lock has shipped since 0.1.0 and the session had nothing to
+        // trigger it, so it locked only when somebody asked -- and a lock
+        // screen nobody remembers to reach for protects nothing. swayidle is
+        // the missing half and these are the two numbers it needs.
+        //
+        // Both are measured from the last input, not from each other, because
+        // that is what swayidle's timeouts mean. Screen-off is therefore the
+        // larger of the two by default: the screen blanks a couple of minutes
+        // after the lock rather than a couple of minutes after idle began.
+        //
+        // 0 disables either one. That is a real thing to want -- a machine
+        // giving a presentation, a kiosk -- and a setting that cannot be turned
+        // off gets turned off by uninstalling the package instead.
+        num("desktop.lock-idle-minutes",   10.0,  0.0, 180.0,
+            "Minutes of inactivity before the screen locks. 0 never locks");
+        num("desktop.screen-off-minutes",  12.0,  0.0, 240.0,
+            "Minutes of inactivity before the screen turns off. 0 keeps it on");
+
         out->add({"desktop.color-scheme", Type::String, std::string("light"),
                   {}, {}, "light or dark. Every LucidOS surface follows it", 1, {},
                   {"light", "dark"}});
