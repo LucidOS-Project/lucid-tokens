@@ -153,8 +153,15 @@ const std::vector<PageSection>& default_page_sections() {
         // first.
         {"Connectivity", {"Network", "Bluetooth"}},
 
-        // Sound, Power and Keyboard belong here next to Display.
-        {"Hardware", {"Display"}},
+        // Power and Keyboard belong here too, next to Display and Sound.
+        //
+        // Sound is second because Display is the one somebody opens on a new
+        // machine and Sound is the one they open when something is wrong -- and
+        // "no sound" is looked for under Sound rather than at the top of a
+        // list. It carries no schema keys: choosing an output device is asking
+        // WirePlumber to change something now, not recording a preference, so
+        // there is nothing for the resolver to hold.
+        {"Hardware", {"Display", "Sound"}},
 
         // How it looks, including the three surfaces LucidOS draws itself.
         {"Personalisation",
