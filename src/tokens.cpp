@@ -396,12 +396,26 @@ const Schema& default_schema() {
         // state to report. A control centre is the first surface that does,
         // and every filled tile in it needs this.
         //
-        // #0d7759 is the aurora itself -- hue 163, sampled from the green
-        // band of lucidos-aurora.jpg rather than chosen. Only its lightness
-        // was moved, down to the darkest point that still clears 4.5:1
-        // against white, because a filled control carries an 11.5px label and
-        // that is normal-size text: the vivid version measured 3.22:1 and was
-        // never available.
+        // #00857a is the aurora itself -- hue 175, sampled from the green
+        // band of lucidos-aurora.jpg rather than chosen. 97% of that image's
+        // saturated pixels fall between 150 and 210 degrees; this sits at the
+        // top of the aurora's own share of that, still the curtain and not the
+        // sky behind it.
+        //
+        // Its lightness is not a taste decision either. Contrast against white
+        // falls as a colour lightens and contrast against black rises, and the
+        // two cross at relative luminance 0.179, where both are 4.58:1. That
+        // is the only luminance at which ONE accent clears 4.5:1 -- normal-size
+        // text, which a filled control's 11.5px label is -- on a white canvas
+        // and on a black one. So the same hex serves both colour schemes and
+        // nothing has to derive a second version of it.
+        //
+        // It was #0d7759 at hue 163, chosen the same way but aimed only at
+        // white: 5.53:1 there and 3.80:1 on black, which is why lucid-settings
+        // carried a routine to lift it in the dark and why the two schemes
+        // showed visibly different greens. That mattered little while the
+        // accent sat among a theme's other colours and a great deal once
+        // Settings became two colours and this one.
         //
         // Why not a blue. Windows is blue, macOS is blue, GNOME is blue, and
         // the first attempt here was #1c222e's neighbourhood at hue 220 -- a
@@ -416,7 +430,7 @@ const Schema& default_schema() {
         // thing people most want to change, and lucid-settings generates its
         // controls from this schema -- so the colour control exists the moment
         // this line does.
-        out->add({"desktop.accent-colour", Type::String, std::string("#0d7759"),
+        out->add({"desktop.accent-colour", Type::String, std::string("#00857a"),
                   {}, {}, "Colour a control uses to show it is on", 1, {}});
         // The one switch. Light by default because that is what LucidOS looks
         // like; the components derive their own palettes from it rather than
