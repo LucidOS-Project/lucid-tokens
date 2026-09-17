@@ -448,15 +448,25 @@ const Schema& default_schema() {
         // preference, and clamping is what this resolver does with a number
         // outside its range.
         //
-        // NOTHING APPLIES THIS YET, and the reason is worth recording. labwc
-        // speaks zwlr_output_manager_v1, which is the protocol that sets an
-        // output's scale -- but no client that speaks it is packaged for 26.04:
-        // no wlr-randr, no kanshi, no wdisplays. And labwc takes no output
-        // configuration of its own; the only scale in its manual belongs to the
-        // magnifier. So the key exists here first, because a setting with
-        // nowhere to live is worse than one whose applier is still being
-        // written, and because lucid-settings generates its controls from this
-        // schema -- the day something applies it, the control is already there.
+        // NOTHING APPLIES THIS, and what that means has changed.
+        //
+        // This used to say no client speaking zwlr_output_manager_v1 was
+        // packaged for 26.04 -- "no wlr-randr, no kanshi, no wdisplays". That
+        // is wrong: resolute has wlr-randr 0.4.1-1build1, and the image has
+        // listed it since the desktop manifest was written. The claim was made
+        // once and never re-checked.
+        //
+        // So the gap it describes is closed, and closed somewhere else:
+        // lucid-settings' Display page drives wlr-randr and sets scale PER
+        // OUTPUT, which is the form the question actually takes on a machine
+        // with a laptop panel and an external monitor that want different
+        // numbers. This key is one number for the whole desktop and cannot
+        // express that.
+        //
+        // It is therefore superseded in practice while still being read by
+        // nothing. Left in place rather than deleted because removing a key is
+        // a decision about every machine that may have set it, and that is a
+        // separate change from adding the page that replaced it.
         num("desktop.scale", 1.0, 0.5, 3.0,
             "How large everything is drawn. 1 is normal, 1.25 and 1.5 suit dense screens");
 
