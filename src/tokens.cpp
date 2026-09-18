@@ -167,11 +167,24 @@ const std::vector<PageSection>& default_page_sections() {
         {"Personalisation",
          {"Appearance", "Wallpaper", "Dock", "Panel", "Control Centre", "Lock Screen"}},
 
-        // Neither of these configures anything -- they report -- which is why
-        // they sit at the bottom together. Storage answers "how full am I",
-        // About answers "what is this". Both are the last thing looked for and
-        // the first thing asked for when something is wrong.
-        {"System", {"Storage", "About"}},
+        // Updates first, then the two that only report. Storage answers "how
+        // full am I", About answers "what is this"; both are the last thing
+        // looked for and the first thing asked for when something is wrong.
+        //
+        // Updates is here rather than in its own application, and that is a
+        // decision rather than a convenience. macOS puts Software Update inside
+        // System Settings and Windows puts it in Settings; GNOME puts it in a
+        // separate Software application, which is where it becomes a thing you
+        // have to remember to open. Zorin ships two -- an Updater and an
+        // Upgrader -- and the useful lesson there is not the split but its
+        // cost: routine updates and a release upgrade really are different
+        // operations, and giving the rare, one-way one a permanent launcher
+        // icon is what makes it look like something to click.
+        //
+        // First in the section because it is the only page here that can need
+        // something from somebody. Storage and About are read when asked; this
+        // one has an answer whether or not anybody came looking.
+        {"System", {"Updates", "Storage", "About"}},
     };
     return *sections;
 }
